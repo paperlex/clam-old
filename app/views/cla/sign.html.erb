@@ -1,0 +1,44 @@
+<style type="text/css" media="screen">
+  table {
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+  }
+    th {
+      text-align: right;
+      vertical-align: top;
+      line-height: 1.4em;
+      padding: 3px 0;
+    }
+    td {
+      padding: 3px 5px;
+      line-height: 1.4em;
+      padding-left: 10px;
+    }
+    td input[type="text"], td textarea {
+      font-size: 16px;
+      width: 200px;
+    }
+    td textarea {
+      width: 600px;
+      height: 120px;
+    }
+</style>
+<h1 style="margin-bottom: 0">Thanks for your interest in contributing to &ldquo;<%= @cla.repo_name %>&rdquo;</h1>
+<% if @signature.blank? %>
+<h2 style="color: #aaa; margin-top: 0">To get started, you'll need to sign a Contributor License Agreement</h2>
+<p style="line-height: 1em">Please provide the following information:<br><small style="color: #aaa">(we'll only use this to generate your CLA &mdash; your information won't be shared or sold)</small></p>
+<% if @error.present? %><p style="color: red; font-weight: bold">You must fill out the form completely&hellip;</p><% end %>
+<form action="/cla/<%= @process_url %>/<%= @cla.repo_name %>/process_form" method="POST">
+<table>
+  <% @clat.user_form.sort_by {|l| l[l.keys.first]["order"] }.each do |line| %>
+  <% key = line.keys.first %>
+  <% field_info = line[key] %>
+  <tr><th><%= field_info["pretty_name"] %>:</th><td><% if field_info["field_type"] == "text_box" %><input type="text" name="user_responses[<%= key %>]" value="<%= @contract.responses[key] rescue "" %>"><% else %><textarea name="user_responses[<%= key %>]"><%= @contract.responses[key] rescue "" %></textarea><% end %><% if field_info["optional"] == "1" %><i> (optional)</i><% end %></td></tr>
+  <% end %>
+  <tr><th></th><td style="padding-top: 20px"><input type="submit" value="Review &amp; sign CLA"> <small style="display: none">or <span style="color: blue; text-decoration: underline; cursor: pointer" onclick="preview()">preview this agreement before you sign it</span></small><small style="color: #333; font-weight: bold; line-height: 1.2em; display: block; margin-top: 5px"><span style="color: #d00">Don't worry &mdash; you're not signing anything yet!</span> You'll be able to review and sign this CLA on the next page</small></td></tr>
+</table>
+</form>
+<% else %>
+<p>Get committing &mdash; you've already signed a Contributor License Agreement for this project!</p>
+<% end %>

@@ -1,0 +1,13 @@
+<style type="text/css" media="screen">
+  ol li {
+    line-height: 1.4em;
+  }
+</style>
+<h1 style="margin-bottom: 0">This is your signed Contributor License Agreement for &ldquo;<%= @contract.contributor_license_agreement.repo_name %>&rdquo;</h1>
+<h2 style="color: #aaa; margin-top: 0">(<a href="/cla">go back</a> to your list of agreements)</h2>
+<div style="text-align: justify">
+<%= @text.html_safe %>
+</div>
+<div style="border-top: 1px solid #aaa; padding-top: 20px; margin-top: 20px; font-size: 20px; border-bottom: 1px solid #aaa; padding-bottom: 20px;">
+  Signed by you on <b><%= @signature.created_at.strftime("%b %e, %Y") %></b> by <b><%= @signature.identity_verification_method == "external" ? "GitHub Account" : @signature.identity_verification_method %></b> verification of <b><%= @signature.identity_verification_value %></b>.
+</div>

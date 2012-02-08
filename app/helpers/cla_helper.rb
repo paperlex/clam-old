@@ -1,0 +1,2 @@
+module ClaHelper
+end

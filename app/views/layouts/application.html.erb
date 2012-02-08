@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CLA Manager</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/clam.css" />
+  <%= csrf_meta_tags %>
+</head>
+<body>
+<div id="header">
+  <div class="layout" style="position: relative">
+  <div id="logo"><a href="<%= @current_user.present? ? "/repositories" : "/" %>"><%= image_tag "/images/clam.png", :height => 40, :style => "vertical-align: -14px" %> <span id="logo_text">CLA Manager</span></a></div>
+  <% if @current_user.present? %>
+  <ul>
+    <li><a href="/cla">Existing Agreements</a></li>
+    <li><a href="/repositories">GitHub Repos</a></li>
+    <li><a href="/auth/logout">Log Out</a></li>
+  </ul>
+  <% else %>
+  <ul>
+    <li><a href="/auth/login">Login</a></li>
+  </ul>
+  <% end %>
+  </div>
+</div>
+  <div id="content">
+  <%= yield %>
+  </div>
+  <div id="footer">
+  These products are not intended to provide legal advice or substitute for the advice of an attorney or advisor.  Paperlex is not a party to any agreement created and/or stored on this site, unless otherwise expressly set forth as such therein. Whimsical shell logo provided by <a href="http://www.flickr.com/photos/snakphotography/">ShutterBugChef</a>.
+  </div>
+  <div id="vanity">
+    Designed in NYC &bull; Powered by Paperlex
+  </div>
+</body>
+</html>

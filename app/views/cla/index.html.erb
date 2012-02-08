@@ -1,0 +1,73 @@
+<style type="text/css" media="screen">
+  table {
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  tr.odd td {
+    background: #eee;
+  }
+  td {
+    padding: 8px 10px;
+  }
+  td a {
+    color: blue;
+  }
+  th {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+  }
+  span.fake_link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  td.actions a {
+    text-decoration: underline;
+  }
+  td input {
+    height: 11px;
+  }
+</style>
+<h1 style="margin-bottom: 10px">Agreements you've created:</h1>
+<% if @current_user.contributor_license_agreements.count == 0 %>
+<p>You haven't created any agreements yet&hellip; <a href="/repositories">Create a new CLA right now!</a>
+<% else %>
+<% reset_cycle %>
+<table>
+  <tr><th>Repo</th><th style="text-align: right">Actions</th></tr>
+<% for cla in @current_user.contributor_license_agreements %>
+<tr class="<%= cycle "odd", "even" %>"><td style="white-space: nowrap"><img src="https://a248.e.akamai.net/assets.github.com/images/icons/public.png" style="vertical-align: -3px">&nbsp;&nbsp;<%= link_to cla.org_name.present? ? cla.org_name : cla.user.github_login, "http://github.com/#{cla.org_name.present? ? cla.org_name : cla.user.github_login}", :target => "_blank" %> / <b><%= link_to cla.repo_name, "http://github.com/#{cla.org_name.present? ? cla.org_name : cla.user.github_login}/#{cla.repo_name}", :target => "_blank" %></b></td>
+  <td style="text-align: right" class="actions"><span class="signing" style="display: none"><b>Signing URL:</b> <input value="<%= CALLBACK_URL %>/cla/<%= cla.org_name.present? ? cla.org_name : cla.user.github_login %>/<%= cla.repo_name %>/sign" onblur="done_select(this)" style="width: 250px"></span><span class="fake_link" onclick="show_signing(this)">Copy signing URL</span>&nbsp;|&nbsp;<a href="/cla/show/<%= cla.org_name.present? ? cla.org_name : cla.user.github_login %>/<%= cla.repo_name %>">View CLA</a><% if cla.signatures.count > 0 %>&nbsp;|&nbsp;<a href="/cla/signers/<%= cla.org_name.present? ? cla.org_name : cla.user.github_login %>/<%= cla.repo_name %>">View <%= pluralize cla.signatures.count, "signer" %></a><% else %>&nbsp;|&nbsp; <span style="color: #888">No signers (yet!)</span><% end %></td>
+</tr>
+<% end %>
+</table>
+<% end %>
+<h1 style="margin-bottom: 10px">Agreements you've signed:</h1>
+<% if @current_user.signatures.count == 0 %>
+<p>You haven't signed any CLAs yet!</p>
+<% else %>
+<% reset_cycle %>
+<table>
+  <tr><th>Repo</th><th style="text-align: right">Actions</th></tr>
+<% for signature in @current_user.signatures %>
+<% cla = signature.contributor_license_agreement %>
+<tr class="<%= cycle "odd", "even" %>"><td style="white-space: nowrap"><img src="https://a248.e.akamai.net/assets.github.com/images/icons/public.png" style="vertical-align: -3px">&nbsp;&nbsp;<%= link_to cla.org_name.present? ? cla.org_name : cla.user.github_login, "http://github.com/#{cla.org_name.present? ? cla.org_name : cla.user.github_login}", :target => "_blank" %> / <b><%= link_to cla.repo_name, "http://github.com/#{cla.org_name.present? ? cla.org_name : cla.user.github_login}/#{cla.repo_name}", :target => "_blank" %></b></td>
+  <td style="text-align: right" class="actions"><a href="/cla/show_signed/<%= signature.contract_uuid %>">View signed CLA</a>&nbsp;&nbsp;&nbsp;<span style="color: #888">Signed <%= signature.created_at.strftime("%b %e, %Y") %></span></td>
+</tr>
+<% end %>
+</table>
+<% end %>
+<script type="text/javascript" charset="utf-8">
+  function show_signing(elm) {
+    $(elm).hide()
+    $(elm).parent().children("span.signing").show()
+    $(elm).parent().children("span.signing").children("input").select()
+  }
+  function done_select(elm) {
+    $(elm).parent().hide()
+    $(elm).parent().parent().children("span.fake_link").show()
+  }
+</script>

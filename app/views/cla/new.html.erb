@@ -1,0 +1,98 @@
+<style type="text/css" media="screen">
+table {
+  margin: 0;
+  padding: 0;
+  border-collapse: collapse;
+}
+  th {
+    text-align: right;
+    vertical-align: top;
+    line-height: 1.4em;
+    padding: 3px 0;
+  }
+  td {
+    padding: 3px 5px;
+    line-height: 1.4em;
+    padding-left: 10px;
+  }
+  td a {
+    color: blue;
+  }
+  td input[type="text"], td textarea {
+    font-size: 16px;
+    width: 200px;
+  }
+  #preview p {
+    margin-top: 0;
+  }
+  #preview ol li {
+    line-height: 1.4em;
+  }
+  #preview {
+    text-align: justify;
+  }
+  select {
+    font-size: 16px;
+  }
+  tr.odd td {
+    background: #eee;
+  }
+</style>
+<h1>Create a new Contributor License Agreement</h1>
+<% if @error.present? and false %><p style="color: red; font-weight: bold">You must provide values for "Company name" and "E-mail address"</p><% end %>
+<form action="/cla/create" method="POST" id="create_form">
+<% if @org.present? %><input type="hidden" name="cla[org_name]" value="<%= @org %>"><% end %>
+<table>
+  <tr><th>Project:</th><td><img src="https://a248.e.akamai.net/assets.github.com/images/icons/public.png" style="vertical-align: -3px">&nbsp;&nbsp;<%= link_to @org || @current_user.github_login, "http://github.com/#{@org || @current_user.github_login}", :target => "_blank" %> / <b><%= link_to @repo["name"], "http://github.com/#{@org || @current_user.github_login}/#{@repo["name"]}", :target => "_blank" %></span><input type="hidden" name="cla[repo_name]" value="<%= @repo["name"] %>"></td></tr>
+    <tr><th>Agreement:</th><td><select id="picker" onchange="select_cla()"><% unless @cla.present? %><option>Choose a Template&hellip;</option><% end %><% for cla in Paperlex::Slaw.all %><option value="<%= cla.uuid %>" <% if @cla.present? and @cla.slaw_uuid == cla.uuid %>selected="selected"<% end %>><%= cla.name %></option><% end %></select></td></tr>
+  <% if @cla.present? %>
+  <tr><td colspan="2">Provide information for the fields specific to your project and company;<br>we'll ask the contributor for any values you leave blank.</td></tr>
+  </table>
+  
+  <input type="hidden" name="slaw_uuid" value="<%= @slaw["uuid"] %>">
+  <table>
+    <tr><th style="text-align: center">Label Name</th><th style="text-align: center">Value</th><th style="text-align: center">Field Type</th><th style="text-align: center">Optional?</th></tr>
+  <% @response_keys.sort.reverse.each_with_index do |key, idx| %>
+  <tr class="<%= cycle "odd", "even" %>"><td><input type="hidden" name="survey[<%= key %>][order]" value="<%= idx %>"><input value="<%= key.humanize %>" placeholder="<%= key.humanize %>" type="text" name="survey[<%= key %>][pretty_name]"></td><td><input type="text" value="" class="value_box" data-key-name="<%= key %>" name="survey[<%= key %>][field_value]"></td><td><select name="survey[<%= key %>][field_type]" id="<%= key %>_select"><option value="text_box">Text box</option><option value="text_area">Text area</option></select></td><td><input type="hidden" name="survey[<%= key %>][optional]" value="0"><input type="checkbox" name="survey[<%= key %>][optional]" value="1" id="<%= key %>_checkbox"></td></tr>
+  <% end %>
+  </table>
+  <br>
+  
+  <% end %>
+  <% if @cla.present? %>
+  <tr><th></th><td><input type="submit" value="Create CLA"> <small>or <span style="color: blue; text-decoration: underline; cursor: pointer" onclick="preview()">preview this CLA before you create it</span></small></td></tr>
+  <% end %>
+</table>
+</form>
+<div id="preview" style="border: 1px solid #666; margin-top: 10px; display: none">
+<div style="background: #666; padding: 10px 20px; color: white; font-weight: bold">Preview</div>
+<div style="padding: 20px"><div id="preview_text">Loading&hellip;</div></div>
+</div>
+<script type="text/javascript" charset="utf-8">
+<% if @cla.present? %>
+  function preview() {
+    $("#preview").show()
+    $.get('/cla/preview/<%= @repo["name"] %>?cla_id=<%= @cla.id %>&' + $("#create_form").serialize(), function(data) {
+      $("#preview_text").html(data)
+    })
+  }
+  <% end %>
+  function select_cla() {
+    id = $("#picker").val()
+    <% if @org.present? %>
+    window.location.href="/cla/new?org=<%= @org %>&repo=<%= params["repo"] %>&cla=" + id
+    <% else %>
+    window.location.href="/cla/new?repo=<%= params["repo"] %>&cla=" + id
+    <% end %>
+  }
+  $("input.value_box").keyup(function(){
+    key = $(this).attr("data-key-name")
+    if($(this).val() != "") {
+      $("#"+key+"_checkbox").hide()
+      $("#"+key+"_select").hide()
+    } else {
+      $("#"+key+"_checkbox").show()
+      $("#"+key+"_select").show()
+    }
+  })
+</script>

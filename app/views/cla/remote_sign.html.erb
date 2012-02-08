@@ -1,0 +1,15 @@
+<h1 style="margin-bottom: 0">This is your Contributor License Agreement for &ldquo;<%= @cla.repo_name %>&rdquo;</h1>
+<% if @error.present? %><div style="margin: 20px 0; text-align: center; color: red; font-weight: bold"><%= @error %></div><% end %>
+<div style="text-align: justify">
+<%= @text.html_safe %>
+</div>
+<div id="sign" style="border-top: 1px solid #ccc; position: relative; margin-top: 20px;">
+    <div style="text-align: center; margin-top: -12px; position: absolute; width: 100%"><span style="display: inline-block; background: white; padding: 0 10px; font-weight: bold; font-size: 120%">Sign with your GitHub account</span></div>
+
+  <form action="/cla/<%= @cla.org_name.present? ? @cla.org_name : @cla.user.github_login %>/<%= @cla.repo_name %>/affix_signature" method="POST">
+    <input type="hidden" name="contract_id" value="<%= @contract.uuid %>">
+    <div style="margin-top: 25px; font-size: 120%"><input type="checkbox" style="font-size: 120%" id="agree" name="agree" value="yes"> <label for="agree">I, <img src="http://www.gravatar.com/avatar/<%= Digest::MD5.hexdigest(@current_user.github_email.strip.downcase) %>?s=16"> <b><%= @current_user.github_login %></b>, agree to be bound by the terms of this Contributor License Agreement.</label></div>  
+    <center><input type="submit" value="Sign Agreement" style="margin-top: 20px;"></center>
+  </form>
+  
+</div>

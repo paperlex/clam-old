@@ -1,0 +1,31 @@
+<style type="text/css" media="screen">
+  table {
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+  }
+  td, th {
+    padding: 3px 5px;
+    line-height: 1.4em;
+  }
+  th {
+    text-align: left;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+  .gravatar {
+    border: 1px solid #d0d0d0;
+    padding: 2px;
+  }
+  .gravatar img {
+    display: block;
+  }
+</style>
+<h1 style="margin-bottom: 0">Signers for the &ldquo;<%= @cla.repo_name %>&rdquo; Contributor License Agreement</h1>
+<h2 style="color: #aaa; margin-top: 0">(<a href="/cla">go back</a> to your list of agreements)</h2>
+<table>
+  <tr><th colspan="2">GitHub user</th><th>Signed</th></tr>
+<% for signature in @cla.signatures %>
+<tr><td style="width: 0"><div class="gravatar"><img src="http://www.gravatar.com/avatar/<%= Digest::MD5.hexdigest(signature.user.github_email.strip.downcase) %>?s=30"></div></td><td style="width: 200px"><%= link_to signature.user.github_login, "http://github.com/#{signature.user.github_login}", :target => "_blank" %></td><td><%= signature.created_at.strftime("%b %e, %Y") %></td></tr>
+<% end %>
+</table>

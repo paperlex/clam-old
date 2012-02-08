@@ -1,0 +1,38 @@
+<style type="text/css" media="screen">
+  button.create {
+    font-size: 100%;
+    padding: 5px 10px;
+  }
+  table {
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+  }
+  table td {
+    padding-bottom: 5px;
+    vertical-align: middle;
+  }
+  td a {
+    color: blue;
+  }
+</style>
+<h1>My public GitHub repos</h1>
+<% if @repos.blank? %>
+<p>You have no public GitHub repos&hellip;</p>
+<% else %>
+<table>
+<% for repo in @repos %>
+<tr><td><div style="padding-bottom: 3px"><img src="https://a248.e.akamai.net/assets.github.com/images/icons/public.png" style="vertical-align: -3px">&nbsp;&nbsp;<b><%= link_to repo["name"], "http://github.com/#{@current_user.github_login}/#{repo["name"]}", :target => "_blank" %></b></div><% if repo["description"].present? %><span style="color: #888; font-size: 90%"><%= repo["description"] %></span><% end %></td><td style="padding-left: 20px"><% if @current_user.contributor_license_agreements.count(:conditions => {:repo_name => repo["name"], :org_name => nil}) == 0 %><button class="create" onclick="window.location.href='<%= url_for :controller => "cla", :action => "new", :repo => repo["name"] %>'">Create CLA</button><% end %></td></tr>
+<% end %>
+</table>
+<% end %>
+<% @org_public_repos.each do |k,v| %>
+  <% unless v.empty? %>
+    <h1>Public repos in &ldquo;<%= k %>&rdquo;</h1>
+    <table>
+    <% for repo in v %>
+    <tr><td><div style="padding-bottom: 3px"><img src="https://a248.e.akamai.net/assets.github.com/images/icons/public.png" style="vertical-align: -3px">&nbsp;&nbsp;<b><%= link_to repo["name"], "http://github.com/#{k}/#{repo["name"]}", :target => "_blank" %></b></div><% if repo["description"].present? %><span style="color: #888; font-size: 90%"><%= repo["description"] %></span><% end %></td><td style="padding-left: 20px"><% if @current_user.contributor_license_agreements.count(:conditions => {:repo_name => repo["name"]}) == 0 %><button class="create" onclick="window.location.href='<%= url_for :controller => "cla", :action => "new", :repo => repo["name"], :org => k %>'">Create CLA</button><% end %></td></tr>
+    <% end %>
+    </table>
+  <% end %>
+<% end %>
