@@ -101,7 +101,7 @@ class ClaController < ApplicationController
     end
     
     begin
-      contract.create_signature(:signer => @user.github_email, :identity => {:value => @user.github_login, :method => "GitHub OAuth", :github_id => @user.github_id, :github_email => @user.github_email}, :remote_ip => request.remote_ip, :user_agent => request.user_agent)
+      contract.create_signature(:signer => @current_user.github_email, :identity => {:value => @user.github_login, :method => "GitHub OAuth", :github_id => @user.github_id, :github_email => @current_user.github_email}, :remote_ip => request.remote_ip, :user_agent => request.user_agent)
     rescue
       @error = "There was a problem signing the contract... please try again later."
       @text = contract.to_html
@@ -166,13 +166,13 @@ class ClaController < ApplicationController
       
       c.update_attribute :uuid, contract.uuid
       
-      signer = contract.create_signer(:email => @user.github_email)
+      signer = contract.create_signer(:email => @current_user.github_email)
       
       @text = contract.to_html
       
       # If you have access to the Remote Signature program, you don't need to create a review session...
       unless HAS_REMOTE_SIGNATURE_ACCESS
-        review_session = contract.create_review_session(:email => @user.github_email, :expires_in => 24.hours)
+        review_session = contract.create_review_session(:email => @current_user.github_email, :expires_in => 24.hours)
         redirect_to(review_session.url)
       else
         @contract = c
@@ -187,14 +187,14 @@ class ClaController < ApplicationController
       contract.responses = @contract.responses.merge(@cla.responses)
       contract.save_responses
       
-      contract.update_signer(contract.signers.first["uuid"], :email => @user.github_email)
+      contract.update_signer(contract.signers.first["uuid"], :email => @current_user.github_email)
       
       @text = contract.to_html
       
       # If you have access to the Remote Signature program, you can leave the next two lines out...
       unless HAS_REMOTE_SIGNATURE_ACCESS
         contract.fetch_review_sessions
-        contract.update_review_session(contract.review_sessions.first.uuid, :expires_in => 24.hours, :email => @user.github_email)    
+        contract.update_review_session(contract.review_sessions.first.uuid, :expires_in => 24.hours, :email => @current_user.github_email)    
         redirect_to(contract.review_sessions.first.url)
       else
         render :action => :remote_sign
