@@ -101,7 +101,7 @@ class ClaController < ApplicationController
     end
     
     begin
-      contract.create_signature(:signer => @current_user.github_email, :identity => {:value => @user.github_login, :method => "GitHub OAuth", :github_id => @user.github_id, :github_email => @current_user.github_email}, :remote_ip => request.remote_ip, :user_agent => request.user_agent)
+      contract.create_signature(:signer => @current_user.github_email, :identity => {:value => @current_user.github_login, :method => "GitHub OAuth", :github_id => @current_user.github_id, :github_email => @current_user.github_email}, :remote_ip => request.remote_ip, :user_agent => request.user_agent)
     rescue
       @error = "There was a problem signing the contract... please try again later."
       @text = contract.to_html
